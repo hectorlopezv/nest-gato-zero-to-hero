@@ -19,36 +19,36 @@ import { TasksService } from './tasks.service';
 export class TasksController {
   constructor(private taskService: TasksService) {}
   @Get()
-  getTasks(@Query() filterDto: GetTaskFilterDto): Task[] {
+  async getTasks(@Query() filterDto: GetTaskFilterDto): Promise<Task[]> {
     //if we have any filters defined, call taskService, getTaskFilters
 
-    if (Object.keys(filterDto).length) {
-      return this.taskService.getTaskWithFilters(filterDto);
-    }
-    //otherwISE GET ALL TASKS
-    return this.taskService.getAllTasks();
+    const response = await this.taskService.getTasks(filterDto);
+    return response;
   }
 
   @Post()
-  createTask(@Body() createTaskDto: CreateTaskDto): Task {
-    return this.taskService.createTasks(createTaskDto);
+  async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
+    return this.taskService.createTask(createTaskDto);
   }
 
   @Get('/:id')
-  getTaskById(@Param('id') id: string): Task {
-    return this.taskService.getTaskById(id);
+  async getTaskById(@Param('id') id: string): Promise<Task> {
+    return await this.taskService.getTaskById(id);
   }
 
   @Delete('/:id')
-  deleteTaskById(@Param('id') id: string): Task {
-    return this.taskService.deleteTaskById(id);
+  async deleteTaskById(@Param('id') id: string): Promise<void> {
+    await this.taskService.deleteTask(id);
   }
 
   @Patch('/:id')
-  updateTaskById(
+  async updateTaskById(
     @Param('id') id: string,
     @Body() updateTaskStatusDto: UpdateTaskStatusDto,
-  ): void {
-    this.taskService.updateTaskById(id, updateTaskStatusDto);
+  ): Promise<Task> {
+    return await this.taskService.updateTaskStatus(
+      id,
+      updateTaskStatusDto.status,
+    );
   }
 }
