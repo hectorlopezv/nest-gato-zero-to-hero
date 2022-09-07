@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
 import { Repository } from 'typeorm';
@@ -24,7 +19,7 @@ export class TaskRepository {
   async findById(id: string, user: User): Promise<Task> {
     const found = await this.taskEntityRepository.findOneBy({ id, user });
     if (!found) {
-      throw new ForbiddenException();
+      throw new NotFoundException(`Task with ID "${id}" not found`);
     }
 
     return found;
