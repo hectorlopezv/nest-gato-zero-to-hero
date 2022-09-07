@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +15,7 @@ import { TaskStatus } from './task.model';
 
 @Injectable()
 export class TaskRepository {
+  private logger = new Logger('TaskRepository', { timestamp: true });
   constructor(
     @InjectRepository(Task)
     private readonly taskEntityRepository: Repository<Task>,
@@ -57,11 +59,12 @@ export class TaskRepository {
       );
     }
 
-    const tasks = await query.getMany();
-    if (!tasks) {
-      throw new ForbiddenException();
+    try {
+      const tasks = await query.getMany();
+      return tasks;
+    } catch (error) {
+      this.logger.error(`${error.message}, ${error.stack}`);
     }
-    return tasks;
   }
 
   async deleteById(id: string, user: User): Promise<void> {
